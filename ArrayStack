@@ -1,151 +1,178 @@
 import java.util.Scanner;
 
 public class ArrayStack {
-    public static final int MAX_CAPACITY =10;
 
-    private int [] data;
+    public static final int MAX_CAPACITY = 10;
+
+    private int[] data;
     private int top;
     private int capacity;
-
-    public ArrayStack(int capcity) {
+    
+    public ArrayStack(int capacity) {
         checkCapacity(capacity);
         this.capacity = capacity;
         this.data = new int[capacity];
         this.top = -1;
     }
-    public ArrayStack(){
+
+    public ArrayStack() {
         this(MAX_CAPACITY);
     }
-    private static void checkCapacity(int capacity){
+
+    private static void checkCapacity(int capacity) {
         if (capacity < 1 || capacity > MAX_CAPACITY) {
-            throw new IllegalStateExpoception(
-                "capacity must be between 1 and " + MAX_CAPACITY);
+            throw new IllegalArgumentException(
+                    "Capacity must be between 1 and " + MAX_CAPACITY);
         }
     }
+
     public void push(int value) {
-        if (isFull()){
-            throw new IllegalStateExpoception("STACK OVERFLOW: Cannot push, stack is full");
+        if (isFull()) {
+            throw new IllegalStateException("STACK OVERFLOW: Cannot push, stack is full");
         }
         data[++top] = value;
     }
-    public int pop (){
+
+    public int pop() {
         if (isEmpty()) {
-            throw new IllegalStateExpoception("STACK UNDERFLOW: Cannot pop, stack is empty");
+            throw new IllegalStateException("STACK UNDERFLOW: Cannot pop, stack is empty");
         }
-        return data [top--];
+        return data[top--];
     }
+
     public int peek() {
-        if (isEmpty()){
-            throw new IllegalStateExpoception("STACK EMPTY: Cannot peek, stack is empty");
+        if (isEmpty()) {
+            throw new IllegalStateException("STACK EMPTY: Cannot peek, stack is empty");
         }
         return data[top];
     }
+
     public boolean isEmpty() {
         return top == -1;
-    }    
-    public boolean isFull() {
-        return top == capacity -1;
     }
+
+    public boolean isFull() {
+        return top == capacity - 1;
+    }
+
     public int size() {
         return top + 1;
     }
-    public void clear(){
+
+    public void clear() {
         top = -1;
     }
+
     public int getCapacity() {
         return capacity;
     }
-    public boolean setCapacity(int newCapacity){
+
+    public boolean setCapacity(int newCapacity) {
         checkCapacity(newCapacity);
         if (size() > newCapacity) {
             return false;
         }
-        int[] newData = new [newCapacity];
-        for (int i = 0; i <= top; i++){
-            newdata[i] = data[i];
+        int[] newData = new int[newCapacity];
+        for (int i = 0; i <= top; i++) {
+            newData[i] = data[i];
         }
         data = newData;
-        capacity = newcapacity;=-
+        capacity = newCapacity;
         return true;
     }
-    public int[] toArray () {
-        int[] copy = new int [size()];
+
+    public int[] toArray() {
+        int[] copy = new int[size()];
         for (int i = 0; i < copy.length; i++) {
             copy[i] = data[i];
         }
         return copy;
     }
+
     private static void display(ArrayStack s) {
         System.out.println();
         if (s.isEmpty()) {
-            System.out.println(" TOP -> (empty)");
+            System.out.println("   TOP -> (empty)");
         } else {
-            int[] item = s.toArray();
-            for (iknt i = item.legnth - 1; i >= 0; i--){
-                System.out.println((i == item.length - 1 ?" TOP ->":"    ")
-                        +"[" + items[i] + "]");
+            int[] items = s.toArray();
+            for (int i = items.length - 1; i >= 0; i--) { 
+                System.out.println((i == items.length - 1 ? "   TOP -> " : "          ")
+                        + "[ " + items[i] + " ]");
             }
         }
-        System.out.println(" (size " + s.size() + " of " + s.getCapacity() +")" );
+        System.out.println("   (size " + s.size() + " of " + s.getCapacity() + ")");
         System.out.println();
     }
-    public static void main(String[] arg) {
+
+    public static void main(String[] args) {
         ArrayStack stack = new ArrayStack();
-        Scanner in = new Scanner(system.in);
-        java.util.random random = new java.util.Random();
+        Scanner in = new Scanner(System.in);
+        java.util.Random random = new java.util.Random();
         boolean running = true;
 
         while (running) {
-            System.out.println("==== ARRAY STACK (max" + stack.getCapacity() + ") ====");
-            System.out.println("1. Push         2.Pop\n3.Peek           4.Check stack (isEmpty/isFull)\n5.Size          6.Clear\n7.Random           8.Display\n9.Exit");
+            System.out.println("===== ARRAY STACK (max " + stack.getCapacity() + ") =====");
+            System.out.println("1. Push   2. Pop   3. Peek   4. Check stack (isEmpty/isFull)");
+            System.out.println("5. Size   6. Clear 7. Random 8. Display     0. Exit");
             System.out.print("Choose: ");
             String choice = in.hasNextLine() ? in.nextLine().trim() : "0";
 
             try {
-                switch (choice){
-                    case "1" :
-                        System.out.print("Ente a Whole number: ");
-                        int value = Integer.parseInt(int.nextLine().trim());
+                switch (choice) {
+                    case "1":
+                        System.out.print("Enter a whole number: ");
+                        int value = Integer.parseInt(in.nextLine().trim());
                         stack.push(value);
-                        System.out.println("POP: " + value + "done.");
+                        System.out.println("PUSH " + value + " done.");
                         break;
-                    case "2" :
-                        System.out.println("POP " + stack.pop() + "removed.");
+                    case "2":
+                        System.out.println("POP: " + stack.pop() + " removed.");
                         break;
-                    case "3" :
-                        System.out.println("PEEK" + stack.pop() + "removed.");
+                    case "3":
+                        System.out.println("PEEK: top is " + stack.peek() + " (not removed).");
                         break;
-                    case "4" :
+                    case "4":
                         System.out.println(stack.isEmpty() ? "Stack is EMPTY."
-                        : stack.full() ? "Stack is NOT empty - it is FULL."
-                        : "Stack is NOt empty.");
-                        break; 
-                    case "5" :
-                        System.out.println("SIZE " + stack.pop() + "removed.");
-                        break; 
-                    case "6" :
-                        System.out.println("CLEAR: stack is now empty. " );
-                    case "7" :
-                        System.out.println("PUSH " + stack.pop() + "removed.");
+                                : stack.isFull() ? "Stack is NOT empty - it is FULL."
+                                : "Stack is NOT empty.");
                         break;
-                    case "8" :
+                    case "5":
+                        if (stack.isEmpty()) {
+                            System.out.println("isEmpty: TRUE - the stack contains no elements.");
+                        } else {
+                            System.out.println("isEmpty: FALSE - the stack contains "
+                                    + stack.size() + " element(s).");
+                        }
                         break;
-                    case "9" :
+                    case "6":
+                        stack.clear();
+                        System.out.println("CLEAR: stack is now empty.");
+                        break;
+                    case "7":
+                        stack.clear();
+                        int count = random.nextInt(stack.getCapacity()) + 1;
+                        for (int i = 0; i < count; i++) {
+                            stack.push(random.nextInt(100) + 1);              
+                        }
+                        System.out.println("RANDOM: " + count + " element(s) pushed.");
+                        break;
+                    case "8":
+                        break;
+                    case "0":
                         running = false;
-                        System.out.println("Goodbye!!!");
+                        System.out.println("Goodbye.");
                         continue;
-                    default :  
+                    default:
                         System.out.println("Invalid choice.");
-                        continue;      
+                        continue;
                 }
-            } catch (NumberFormatExeption ex) {
-                System.out.println("INVALID INPUT: Please enter a whole number.");               
-            }catch (IllegalStateExpoception ex){
-                System.out.print(ex.getMessage());
+            } catch (NumberFormatException ex) {
+                System.out.println("INVALID INPUT: Please enter a whole number.");
+            } catch (IllegalStateException ex) {
+                System.out.println(ex.getMessage()); 
             }
             display(stack);
         }
         in.close();
     }
-        
 }
