@@ -7,7 +7,7 @@ public class ArrayStack {
     private int[] data;
     private int top;
     private int capacity;
-    
+
     public ArrayStack(int capacity) {
         checkCapacity(capacity);
         this.capacity = capacity;
@@ -95,7 +95,7 @@ public class ArrayStack {
             System.out.println("   TOP -> (empty)");
         } else {
             int[] items = s.toArray();
-            for (int i = items.length - 1; i >= 0; i--) { 
+            for (int i = items.length - 1; i >= 0; i--) {
                 System.out.println((i == items.length - 1 ? "   TOP -> " : "          ")
                         + "[ " + items[i] + " ]");
             }
@@ -113,7 +113,7 @@ public class ArrayStack {
         while (running) {
             System.out.println("===== ARRAY STACK (max " + stack.getCapacity() + ") =====");
             System.out.println("1. Push   2. Pop   3. Peek   4. Check stack (isEmpty/isFull)");
-            System.out.println("5. Size   6. Clear 7. Random 8. Display     0. Exit");
+            System.out.println("5. Clear   6. Random   0. Exit");
             System.out.print("Choose: ");
             String choice = in.hasNextLine() ? in.nextLine().trim() : "0";
 
@@ -137,39 +137,28 @@ public class ArrayStack {
                                 : "Stack is NOT empty.");
                         break;
                     case "5":
-                        if (stack.isEmpty()) {
-                            System.out.println("isEmpty: TRUE - the stack contains no elements.");
-                        } else {
-                            System.out.println("isEmpty: FALSE - the stack contains "
-                                    + stack.size() + " element(s).");
-                        }
-                        break;
-                    case "6":
-                        stack.clear();
-                        System.out.println("CLEAR: stack is now empty.");
-                        break;
-                    case "7":
                         stack.clear();
                         int count = random.nextInt(stack.getCapacity()) + 1;
                         for (int i = 0; i < count; i++) {
-                            stack.push(random.nextInt(100) + 1);              
+                            stack.push(random.nextInt(100) + 1);
                         }
                         System.out.println("RANDOM: " + count + " element(s) pushed.");
-                        break;
-                    case "8":
-                        break;
+                        break;                    case "6":
+                        stack.clear();
+                        System.out.println("CLEAR: stack is now empty.");
+                        break;                 
                     case "0":
                         running = false;
                         System.out.println("Goodbye.");
                         continue;
                     default:
-                        System.out.println("Invalid choice.");
+                        System.out.println("INVALID CHOICE: enter 0 to 6");
                         continue;
                 }
             } catch (NumberFormatException ex) {
                 System.out.println("INVALID INPUT: Please enter a whole number.");
             } catch (IllegalStateException ex) {
-                System.out.println(ex.getMessage()); 
+                System.out.println(ex.getMessage());
             }
             display(stack);
         }
