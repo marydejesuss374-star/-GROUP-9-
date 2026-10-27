@@ -1,0 +1,23 @@
+import java.util.Scanner;
+import java.util.Stack;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Scanner input = new Scanner(System.in);
+        Stack<String> stack = new Stack<>();
+        int choice;
+
+        do {
+            System.out.println("\n=== STACK OPERATIONS ===");
+            System.out.println("1. Push");
+            System.out.println("2. Pop");
+            System.out.println("3. Peek");
+            System.out.println("4. Display Stack");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+
+            choice = input.nextInt();
+            input.nextLine();
+
+            switch (choice) {
