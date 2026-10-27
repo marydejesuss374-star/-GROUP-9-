@@ -20,3 +20,4 @@ public class StackVisualization {
             System.out.println(stack.get(i));
         }
     }
+}
