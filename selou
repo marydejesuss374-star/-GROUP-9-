@@ -20,4 +20,4 @@ public class Main {
             choice = input.nextInt();
             input.nextLine();
 
-            switch (choice) {
+        
