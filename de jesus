@@ -1,0 +1,22 @@
+import java.util.Stack;
+
+public class StackVisualization {
+    public static void main(String[] args) {
+
+        // Create a stack
+        Stack<String> stack = new Stack<>();
+
+        // Push items into the stack
+        stack.push("Glaiza Orence");
+        stack.push("Rosel Andraje");
+        stack.push("Josh Mariano");
+        stack.push("@Mary De Jesus");
+
+        // Peek displays the top item without removing it
+        System.out.println("TOP -> " + stack.peek() + " (Peek Highlight)\n");
+
+        // Display the stack vertically (newest on top)
+        for (int i = stack.size() - 1; i >= 0; i--) {
+            System.out.println(stack.get(i));
+        }
+    }
