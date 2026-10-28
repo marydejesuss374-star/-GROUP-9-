@@ -1,65 +1,44 @@
-import java.util.Scanner;
-import java.util.Stack;
+// sana tama na 
+// PUSH button
+pushButton.addActionListener(e -> {
+    String item = input.getText().trim();
 
-public class Main {
-    public static void main(String[] args) {
-
-        Scanner input = new Scanner(System.in);
-        Stack<String> stack = new Stack<>();
-        int choice;
-
-        do {
-            System.out.println("\n=== STACK OPERATIONS ===");
-            System.out.println("1. Push");
-            System.out.println("2. Pop");
-            System.out.println("3. Peek");
-            System.out.println("4. Display Stack");
-            System.out.println("5. Exit");
-            System.out.print("Enter your choice: ");
-
-            choice = input.nextInt();
-            input.nextLine();
-
- switch (choice) {
-
-                case 1:
-                    System.out.print("Enter an item: ");
-                    String item = input.nextLine();
-                    stack.push(item);
-                    System.out.println("Item pushed successfully!");
-                    break;
-
-                case 2:
-                    if (!stack.isEmpty()) {
-                        System.out.println("Removed: " + stack.pop());
-                    } else {
-                        System.out.println("Stack is empty!");
-                    }
-                    break;
-
-                case 3:
-                    if (!stack.isEmpty()) {
-                        System.out.println("Top item: " + stack.peek());
-                    } else {
-                        System.out.println("Stack is empty!");
-                    }
-                    break;
-
-                case 4:
-                    System.out.println("Stack: " + stack);
-                    break;
-
-                case 5:
-                    System.out.println("Program ended.");
-                    break;
-
-                default:
-                    System.out.println("Invalid choice!");
-            }
-
-        } while (choice != 5);
-
-        input.close();
+    if (item.isEmpty()) {
+        status.setText("Enter an item first!");
+    } else if (top == stack.length - 1) {
+        status.setText("Stack is full!");
+    } else {
+        stack[++top] = item;
+        input.setText("");
+        status.setText("Pushed: " + item);
+        updateStack();
     }
-}
-        
+});
+
+
+
+
+
+// POP button
+popButton.addActionListener(e -> {
+    if (top == -1) {
+        status.setText("Stack is empty!");
+    } else {
+        String item = stack[top];
+        stack[top--] = null;
+        status.setText("Popped: " + item);
+        updateStack();
+    }
+});
+
+
+
+
+// PEEK button
+peekButton.addActionListener(e -> {
+    if (top == -1) {
+        status.setText("Stack is empty!");
+    } else {
+        status.setText("Top item: " + stack[top]);
+    }
+});
