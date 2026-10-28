@@ -1,23 +1,99 @@
-import java.util.Stack;
+import javax.swing.*;
+import java.awt.*;
 
-public class StackVisualization {
-    public static void main(String[] args) {
+public class StackVisualization extends JFrame {
 
-        // Create a stack
-        Stack<String> stack = new Stack<>();
+    private int[] stack = new int[10];
+    private int top = -1;
 
-        // Push items into the stack
-        stack.push("Glaiza Orence");
-        stack.push("Rosel Andraje");
-        stack.push("Josh Mariano");
-        stack.push("@Mary De Jesus");
+    private JTextField inputField;
+    private JTextArea displayArea;
 
-        // Peek displays the top item without removing it
-        System.out.println("TOP -> " + stack.peek() + " (Peek Highlight)\n");
+    public StackVisualization() {
+        setTitle("Stack Visualization");
+        setSize(400, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        // Display the stack vertically (newest on top)
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            System.out.println(stack.get(i));
+        JPanel topPanel = new JPanel();
+
+        inputField = new JTextField(10);
+        JButton pushBtn = new JButton("Push");
+        JButton popBtn = new JButton("Pop");
+        JButton peekBtn = new JButton("Peek");
+
+        topPanel.add(new JLabel("Value:"));
+        topPanel.add(inputField);
+        topPanel.add(pushBtn);
+        topPanel.add(popBtn);
+        topPanel.add(peekBtn);
+
+        add(topPanel, BorderLayout.NORTH);
+
+        displayArea = new JTextArea();
+        displayArea.setEditable(false);
+
+        add(new JScrollPane(displayArea), BorderLayout.CENTER);
+
+        pushBtn.addActionListener(e -> push());
+        popBtn.addActionListener(e -> pop());
+        peekBtn.addActionListener(e -> peek());
+
+        setVisible(true);
+    }
+
+    private void push() {
+        if (top == stack.length - 1) {
+            JOptionPane.showMessageDialog(this, "Stack Overflow");
+            return;
         }
+
+        try {
+            int value = Integer.parseInt(inputField.getText());
+            stack[++top] = value;
+            inputField.setText("");
+            updateDisplay();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Enter a valid number");
+        }
+    }
+
+    private void pop() {
+        if (top == -1) {
+            JOptionPane.showMessageDialog(this, "Stack Underflow");
+            return;
+        }
+
+        int removed = stack[top--];
+        JOptionPane.showMessageDialog(this, "Popped: " + removed);
+        updateDisplay();
+    }
+
+    private void peek() {
+        if (top == -1) {
+            JOptionPane.showMessageDialog(this, "Stack Empty");
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this, "Top Element: " + stack[top]);
+    }
+
+    private void updateDisplay() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("TOP\n");
+        sb.append(" |\n");
+
+        for (int i = top; i >= 0; i--) {
+            sb.append("[ ")
+              .append(stack[i])
+              .append(" ]\n");
+        }
+
+        displayArea.setText(sb.toString());
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new StackVisualization());
     }
 }
