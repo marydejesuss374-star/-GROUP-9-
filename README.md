@@ -2,15 +2,15 @@
 ## Group 9
 
 ## Group Members
-Glaiza Mae Uyangurin Orence 
+- Glaiza Mae Uyangurin Orence 
 
-Rosel Andraje
+- Rosel Andraje
 
-Mary De Jesus
+- Mary De Jesus
 
-Joshandrew Mariano
+- Joshandrew Mariano
 
-Zhandy Corpuz
+- Zhandy Corpuz
 
 # Description of the program
 # Features
