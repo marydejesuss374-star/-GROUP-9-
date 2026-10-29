@@ -13,7 +13,7 @@
 
 
 # Description of the program
-
+This program demonstrates the implementation of a Stack data structure using Java. It allows users to perform basic stack operations such as Push, Pop, and Peek through a graphical user interface (GUI). The program follows the Last In, First Out (LIFO) principle, where the most recently added item is the first one to be removed.
 
 # Features
 
@@ -30,6 +30,17 @@
 
 
 # Requirements
+Software Requirements:
+
+- Java Development Kit (JDK) 8 or higher
+- Visual Studio Code (VS Code)
+- Extension Pack for Java (VS Code Extension)
+
+Hardware Requirements:
+
+- Computer or laptop
+- At least 4 GB RAM
+- Minimum 200 MB free storage space
 
 
 # How to run the program
@@ -57,6 +68,8 @@
 
 
 # Stack Implementation
+Our group implemented the stack using an array to store the values entered by the user. We used the LIFO (Last In, First Out) principle, which means the last item added is the first one removed. We connected the stack to our GUI buttons so that Push adds an item, Pop removes the top item, and Peek displays the top item without removing it. We also added checks to prevent errors when the stack is full or empty. The GUI updates whenever the stack changes, allowing us to see the items displayed vertically.
+
 # Screenshots
 
 # AI Disclosure
