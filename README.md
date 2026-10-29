@@ -3,9 +3,13 @@
 
 ## Group Members
 Glaiza Mae Uyangurin Orence 
-Joshandrew Mariano
-Mary De Jesus Added by you
+
 Rosel Andraje
+
+Mary De Jesus
+
+Joshandrew Mariano
+
 Zhandy Corpuz
 
 4. Description of the program
