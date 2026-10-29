@@ -1,0 +1,339 @@
+import javax.swing.*;
+import java.awt.*;
+import java.util.function.Consumer;   // ADDED (used by the history helper)
+
+public class Main {
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Stack Visualization");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1150, 480);   // CHANGED: wider window (was 450, 400) so stack B and the history fit
+        frame.setLocationRelativeTo(null);
+
+        // Array stack
+        String[] stack = new String[10];
+        int[] top = {-1};
+
+        //  ADDED (2): Stack B 
+        String[] stackB = new String[10];
+        int[] topB = {-1};
+
+        //  ADDED (4): Max capacity of each stack (1 to 10) 
+        int[] capacityA = {10};
+        int[] capacityB = {10};
+
+        //  ADDED (1): UNDO = a copy of both stacks from before the last operation 
+        String[] backupA = new String[10];
+        String[] backupB = new String[10];
+        int[] backupTopA = {-1};
+        int[] backupTopB = {-1};
+        int[] backupCapacityA = {10};
+        int[] backupCapacityB = {10};
+        boolean[] hasBackup = {false};
+
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        JLabel title = new JLabel("STACK VISUALIZATION", JLabel.CENTER);
+
+        JTextField inputField = new JTextField(12);
+
+        JPanel inputPanel = new JPanel();
+        inputPanel.add(new JLabel("Enter Value:"));
+        inputPanel.add(inputField);
+
+        // Buttons
+        JButton pushButton = new JButton("PUSH");
+        JButton popButton = new JButton("POP");
+        JButton peekButton = new JButton("PEEK");
+        JButton clearButton = new JButton("CLEAR");
+        JButton checkButton = new JButton("CHECK STACK");
+        JButton randomButton = new JButton("RANDOM");
+
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 3, 8, 8));
+        buttonPanel.add(pushButton);
+        buttonPanel.add(popButton);
+        buttonPanel.add(peekButton);
+        buttonPanel.add(clearButton);
+        buttonPanel.add(checkButton);
+        buttonPanel.add(randomButton);
+
+        DefaultListModel<String> stackModel = new DefaultListModel<>();
+        JList<String> stackList = new JList<>(stackModel);
+        stackList.setVisibleRowCount(5);
+
+        //  ADDED (2): Stack B list 
+        DefaultListModel<String> stackModelB = new DefaultListModel<>();
+        JList<String> stackListB = new JList<>(stackModelB);
+        stackListB.setVisibleRowCount(5);
+
+        //  ADDED (3): History list 
+        DefaultListModel<String> historyModel = new DefaultListModel<>();
+        JList<String> historyList = new JList<>(historyModel);
+
+        //ADDED: new buttons 
+        JButton transferButton = new JButton("TRANSFER A -> B");
+        JButton undoButton = new JButton("UNDO");
+        JButton popButtonB = new JButton("POP B");
+
+        // ADDED (4): Max capacity selectors (1 to 10) 
+        JSpinner capacitySpinnerA = new JSpinner(new SpinnerNumberModel(10, 1, 10, 1));
+        JSpinner capacitySpinnerB = new JSpinner(new SpinnerNumberModel(10, 1, 10, 1));
+
+        //ADDED: two small helpers
+        // saveBackup: call it BEFORE an operation changes anything (this is what UNDO goes back to)
+        Runnable saveBackup = () -> {
+            System.arraycopy(stack, 0, backupA, 0, stack.length);
+            System.arraycopy(stackB, 0, backupB, 0, stackB.length);
+            backupTopA[0] = top[0];
+            backupTopB[0] = topB[0];
+            backupCapacityA[0] = capacityA[0];
+            backupCapacityB[0] = capacityB[0];
+            hasBackup[0] = true;
+        };
+
+        // addHistory: call it AFTER an operation (the newest line goes on top)
+        Consumer<String> addHistory = text -> historyModel.add(0, text);
+
+        JLabel statusLabel = new JLabel("Ready", JLabel.CENTER);
+
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(title, BorderLayout.NORTH);
+        topPanel.add(inputPanel, BorderLayout.CENTER);
+
+        // ADDED (4): max capacity selector for stack A
+        JPanel capacityPanelA = new JPanel();
+        capacityPanelA.add(new JLabel("Max Capacity:"));
+        capacityPanelA.add(capacitySpinnerA);
+        topPanel.add(capacityPanelA, BorderLayout.SOUTH);
+
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(new JScrollPane(stackList), BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        frame.add(mainPanel);
+        frame.add(statusLabel, BorderLayout.PAGE_END);
+
+        // ADDED (2): Stack B panel 
+        JLabel titleB = new JLabel("STACK B", JLabel.CENTER);
+
+        JPanel capacityPanelB = new JPanel();
+        capacityPanelB.add(new JLabel("Max Capacity:"));
+        capacityPanelB.add(capacitySpinnerB);
+
+        JPanel infoPanelB = new JPanel(new GridLayout(2, 1));
+        infoPanelB.add(new JLabel("(gets its values from TRANSFER)", JLabel.CENTER));
+        infoPanelB.add(capacityPanelB);
+
+        JPanel topPanelB = new JPanel(new BorderLayout());
+        topPanelB.add(titleB, BorderLayout.NORTH);
+        topPanelB.add(infoPanelB, BorderLayout.CENTER);
+
+        JPanel panelB = new JPanel(new BorderLayout(10, 10));
+        panelB.add(topPanelB, BorderLayout.NORTH);
+        panelB.add(new JScrollPane(stackListB), BorderLayout.CENTER);
+        panelB.add(popButtonB, BorderLayout.SOUTH);
+        panelB.setPreferredSize(new Dimension(260, 0));
+
+        // ADDED: TRANSFER and UNDO buttons (between stack A and stack B) 
+        JPanel middleButtons = new JPanel(new GridLayout(2, 1, 10, 10));
+        middleButtons.add(transferButton);
+        middleButtons.add(undoButton);
+
+        JPanel middlePanel = new JPanel(new GridBagLayout());   // keeps the two buttons in the middle
+        middlePanel.add(middleButtons);
+
+        // ADDED (3): History panel 
+        JPanel historyPanel = new JPanel(new BorderLayout(5, 5));
+        historyPanel.add(new JLabel("OPERATION HISTORY", JLabel.CENTER), BorderLayout.NORTH);
+        historyPanel.add(new JScrollPane(historyList), BorderLayout.CENTER);
+        historyPanel.setPreferredSize(new Dimension(260, 0));
+
+        // ADDED: everything on the right side of the window
+        JPanel rightPanel = new JPanel(new BorderLayout(10, 10));
+        rightPanel.add(middlePanel, BorderLayout.WEST);
+        rightPanel.add(panelB, BorderLayout.CENTER);
+        rightPanel.add(historyPanel, BorderLayout.EAST);
+        frame.add(rightPanel, BorderLayout.EAST);
+
+        // PUSH handler
+        pushButton.addActionListener(e -> {
+            String value = inputField.getText().trim();
+
+            if (value.isEmpty()) {
+                statusLabel.setText("Please enter a value.");
+            } else if (top[0] == capacityA[0] - 1) {   // CHANGED: uses the max capacity (was stack.length - 1)
+                statusLabel.setText("Stack is full!");
+            } else {
+                saveBackup.run();                      // ADDED (1)
+                stack[++top[0]] = value;
+                inputField.setText("");
+                updateStack(stack, top[0], stackModel);
+                statusLabel.setText("Pushed: " + value);
+                addHistory.accept("PUSH " + value + " (A)");   // ADDED (3)
+            }
+        });
+
+        // POP handler
+        popButton.addActionListener(e -> {
+            if (top[0] == -1) {
+                statusLabel.setText("Stack is empty!");
+            } else {
+                saveBackup.run();                      // ADDED (1)
+                String value = stack[top[0]];
+                stack[top[0]--] = null;
+                updateStack(stack, top[0], stackModel);
+                statusLabel.setText("Popped: " + value);
+                addHistory.accept("POP " + value + " (A)");    // ADDED (3)
+            }
+        });
+
+        // PEEK handler
+        peekButton.addActionListener(e -> {
+            if (top[0] == -1) {
+                statusLabel.setText("Stack is empty!");
+            } else {
+                statusLabel.setText("Top value: " + stack[top[0]]);
+                addHistory.accept("PEEK " + stack[top[0]] + " (A)");   // ADDED (3)
+            }
+        });
+
+        // CLEAR handler
+        clearButton.addActionListener(e -> {
+            saveBackup.run();                          // ADDED (1)
+            top[0] = -1;
+            for (int i = 0; i < stack.length; i++) {
+                stack[i] = null;
+            }
+            updateStack(stack, top[0], stackModel);
+            statusLabel.setText("Stack cleared.");
+            addHistory.accept("CLEAR (A)");            // ADDED (3)
+        });
+
+        // CHECK STACK handler
+        checkButton.addActionListener(e -> {
+            statusLabel.setText("Stack size: " + (top[0] + 1));
+            addHistory.accept("CHECK (A) size = " + (top[0] + 1));   // ADDED (3)
+        });
+
+        // RANDOM handler
+        randomButton.addActionListener(e -> {
+            if (top[0] == capacityA[0] - 1) {          // CHANGED: uses the max capacity (was stack.length - 1)
+                statusLabel.setText("Stack is full!");
+            } else {
+                saveBackup.run();                      // ADDED (1)
+                String value = String.valueOf(
+                    (int) (Math.random() * 100)
+                );
+                stack[++top[0]] = value;
+                updateStack(stack, top[0], stackModel);
+                statusLabel.setText("Random value pushed: " + value);
+                addHistory.accept("RANDOM " + value + " (A)");  // ADDED (3)
+            }
+        });
+
+        // (2): TRANSFER handler (moves the top of A onto B)
+        transferButton.addActionListener(e -> {
+            if (top[0] == -1) {
+                statusLabel.setText("Stack A is empty!");
+            } else if (topB[0] == capacityB[0] - 1) {
+                statusLabel.setText("Stack B is full!");
+            } else {
+                saveBackup.run();
+                String value = stack[top[0]];
+                stack[top[0]--] = null;          // take it off A
+                stackB[++topB[0]] = value;       // put it on B
+                updateStack(stack, top[0], stackModel);
+                updateStack(stackB, topB[0], stackModelB);
+                statusLabel.setText("Transferred: " + value + " (A -> B)");
+                addHistory.accept("TRANSFER " + value + " (A -> B)");
+            }
+        });
+
+        //(2): POP B handler
+        popButtonB.addActionListener(e -> {
+            if (topB[0] == -1) {
+                statusLabel.setText("Stack B is empty!");
+            } else {
+                saveBackup.run();
+                String value = stackB[topB[0]];
+                stackB[topB[0]--] = null;
+                updateStack(stackB, topB[0], stackModelB);
+                statusLabel.setText("Popped from B: " + value);
+                addHistory.accept("POP " + value + " (B)");
+            }
+        });
+
+        //(1): UNDO handler (goes back to the copy made before the last operation)
+        undoButton.addActionListener(e -> {
+            if (!hasBackup[0]) {
+                statusLabel.setText("Nothing to undo.");
+            } else {
+                System.arraycopy(backupA, 0, stack, 0, stack.length);
+                System.arraycopy(backupB, 0, stackB, 0, stackB.length);
+                top[0] = backupTopA[0];
+                topB[0] = backupTopB[0];
+                capacityA[0] = backupCapacityA[0];
+                capacityB[0] = backupCapacityB[0];
+                capacitySpinnerA.setValue(capacityA[0]);   // the spinner listener does nothing here (same number)
+                capacitySpinnerB.setValue(capacityB[0]);
+                updateStack(stack, top[0], stackModel);
+                updateStack(stackB, topB[0], stackModelB);
+                hasBackup[0] = false;                      // only the most recent operation can be undone
+                statusLabel.setText("Last operation undone.");
+                addHistory.accept("UNDO");
+            }
+        });
+
+        //(4): MAX CAPACITY handler for stack A
+        capacitySpinnerA.addChangeListener(e -> {
+            int newCapacity = (Integer) capacitySpinnerA.getValue();
+
+            if (newCapacity == capacityA[0]) {
+                return;   // nothing changed
+            }
+
+            if (newCapacity < top[0] + 1) {
+                statusLabel.setText("Stack A has " + (top[0] + 1) + " values, capacity can't be smaller.");
+                capacitySpinnerA.setValue(capacityA[0]);   // put the old number back
+            } else {
+                saveBackup.run();
+                capacityA[0] = newCapacity;
+                statusLabel.setText("Stack A max capacity: " + newCapacity);
+                addHistory.accept("CAPACITY (A) = " + newCapacity);
+            }
+        });
+
+        //(4): MAX CAPACITY handler for stack B 
+        capacitySpinnerB.addChangeListener(e -> {
+            int newCapacity = (Integer) capacitySpinnerB.getValue();
+
+            if (newCapacity == capacityB[0]) {
+                return;   // nothing changed
+            }
+
+            if (newCapacity < topB[0] + 1) {
+                statusLabel.setText("Stack B has " + (topB[0] + 1) + " values, capacity can't be smaller.");
+                capacitySpinnerB.setValue(capacityB[0]);   // put the old number back
+            } else {
+                saveBackup.run();
+                capacityB[0] = newCapacity;
+                statusLabel.setText("Stack B max capacity: " + newCapacity);
+                addHistory.accept("CAPACITY (B) = " + newCapacity);
+            }
+        });
+
+        frame.setVisible(true);
+    }
+
+    private static void updateStack(
+            String[] stack, int top, DefaultListModel<String> model) {
+
+        model.clear();
+
+        for (int i = top; i >= 0; i--) {
+            if (i == top) {
+                model.addElement("TOP -> " + stack[i]);
+            } else {
+                model.addElement("          " + stack[i]);
+            }
+        }
+    }
+}
