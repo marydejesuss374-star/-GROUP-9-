@@ -317,7 +317,7 @@ public class Main {
         RButton popB = new RButton("POP", new Color(0x032F30));
         RButton peekB = new RButton("PEEK", new Color(0x0A7075));
         RButton clearB = new RButton("CLEAR", new Color(0x0C969C));
-        RButton checkB = new RButton("CHECK STACK", new Color(0x6BA3BE));
+        RButton checkB = new RButton("CHECK", new Color(0x6BA3BE));
         RButton randB = new RButton("RANDOM", new Color(0x274D60));
         pushB.addActionListener(e -> push());
         popB.addActionListener(e -> pop(A, "A"));
