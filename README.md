@@ -14,7 +14,22 @@
 
 
 # Description of the program
+
+
 # Features
+
+1. Push – Adds a new value to the top of the stack.
+2. Pop – Removes the top value from the stack.
+3. Peek – Shows the top value without removing it.
+4. Vertical Stack Visualization – Displays the stack items vertically in the GUI.
+5. Input Field – Allows users to enter values to add to the stack.
+6. Clear Stack – Removes all items from the stack.
+7. Check Stack – Shows the current number of items in the stack.
+8. Random Value – Generates a random number and adds it to the stack.
+9. Empty Stack Check – Prevents Pop and Peek from working when the stack is empty.
+10. Full Stack Check – Prevents adding more items when the array reaches its maximum capacity.
+
+
 # Requirements
 
 
