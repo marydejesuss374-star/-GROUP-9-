@@ -1,0 +1,409 @@
+import javax.swing.*;
+import javax.swing.border.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.Random;
+
+public class Main {
+
+    static final Color BG      = new Color(0x031716);
+    static final Color CARD    = new Color(0x032F30);
+    static final Color BORDER  = new Color(0x0A7075);
+    static final Color TEXT    = new Color(0xE6F4F4);
+    static final Color MUTED   = new Color(0x6BA3BE);
+    static final Color PRIMARY = new Color(0x0C969C);
+    static final Color TEAL    = new Color(0x0A7075);
+    static final Color STEEL   = new Color(0x274D60);
+    static final Color GREEN   = new Color(0x5FD3D8);
+    static final Color RED     = new Color(0xE5736B);
+    static final Color AMBER   = new Color(0xE3B341);
+    static final Color GRAY    = new Color(0x274D60);
+    static final Font  BASE    = new Font("SansSerif", Font.PLAIN, 13);
+    static final Font  BOLD    = new Font("SansSerif", Font.BOLD, 13);
+
+    static class ArrayStack {
+        String[] data = new String[10];
+        int top = -1, cap = 10;
+
+        boolean push(String v) { if (top + 1 >= cap) return false; data[++top] = v; return true; }
+        String pop()  { if (top < 0) return null; String v = data[top]; data[top--] = null; return v; }
+        String peek() { return top < 0 ? null : data[top]; }
+        void clear()  { data = new String[10]; top = -1; }
+        int size()    { return top + 1; }
+        ArrayStack copy() {
+            ArrayStack s = new ArrayStack();
+            s.data = data.clone(); s.top = top; s.cap = cap;
+            return s;
+        }
+    }
+
+    static class StackView extends JPanel {
+        final ArrayStack s;
+        StackView(ArrayStack s) { this.s = s; setOpaque(false); setPreferredSize(new Dimension(220, 330)); }
+
+        @Override protected void paintComponent(Graphics g0) {
+            Graphics2D g = (Graphics2D) g0.create();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            int n = 10, gap = 5, pad = 6, left = 28, right = 46;
+            int sh = (getHeight() - 2 * pad - (n - 1) * gap) / n;
+            int x = left, w = getWidth() - left - right;
+            for (int i = 0; i < n; i++) {
+                int y = getHeight() - pad - (i + 1) * sh - i * gap;
+                g.setFont(new Font("SansSerif", Font.PLAIN, 11));
+                g.setColor(MUTED);
+                g.drawString(String.valueOf(i), 6, y + sh / 2 + 4);
+                if (i > s.top) {
+                    boolean usable = i < s.cap;
+                    g.setColor(usable ? new Color(0x042A2B) : new Color(0x021F20));
+                    g.fillRoundRect(x, y, w, sh, 10, 10);
+                    g.setColor(usable ? new Color(0x0A5C61) : new Color(0x063A3C));
+                    g.drawRoundRect(x, y, w, sh, 10, 10);
+                } else {
+                    boolean isTop = i == s.top;
+                    g.setColor(isTop ? PRIMARY : STEEL);
+                    g.fillRoundRect(x, y, w, sh, 10, 10);
+                    g.setColor(Color.WHITE);
+                    g.setFont(new Font("SansSerif", Font.BOLD, 14));
+                    String t = s.data[i];
+                    FontMetrics fm = g.getFontMetrics();
+                    if (fm.stringWidth(t) > w - 12) {
+                        while (t.length() > 1 && fm.stringWidth(t + "…") > w - 12) t = t.substring(0, t.length() - 1);
+                        t += "…";
+                    }
+                    g.drawString(t, x + (w - fm.stringWidth(t)) / 2, y + (sh + fm.getAscent()) / 2 - 2);
+                    if (isTop) {
+                        g.setColor(GREEN);
+                        g.setFont(new Font("SansSerif", Font.BOLD, 11));
+                        g.drawString("◀ TOP", x + w + 6, y + sh / 2 + 4);
+                    }
+                }
+            }
+            g.dispose();
+        }
+    }
+
+    static class RButton extends JButton {
+        final Color base;
+        final boolean veryDark;
+        RButton(String text, Color base) {
+            super(text);
+            this.base = base;
+            setContentAreaFilled(false);
+            setFocusPainted(false);
+            setBorderPainted(false);
+            setRolloverEnabled(true);
+            double lum = (0.299 * base.getRed() + 0.587 * base.getGreen() + 0.114 * base.getBlue()) / 255.0;
+            veryDark = lum < 0.2;
+            setForeground(lum > 0.4 ? new Color(0x031716) : Color.WHITE);
+            setFont(BOLD);
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        }
+        @Override protected void paintComponent(Graphics g0) {
+            Graphics2D g = (Graphics2D) g0.create();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            Color c = !isEnabled() ? new Color(0xC5CAD3)
+                    : getModel().isPressed() ? base.darker()
+                    : getModel().isRollover() ? base.brighter() : base;
+            g.setColor(c);
+            g.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+            if (veryDark) {
+                g.setColor(new Color(0x0A7075));
+                g.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+            }
+            g.dispose();
+            super.paintComponent(g0);
+        }
+    }
+
+    final ArrayStack A = new ArrayStack(), B = new ArrayStack();
+    ArrayStack backupA, backupB;
+    final DefaultListModel<String> history = new DefaultListModel<>();
+    final Random rnd = new Random();
+
+    JTextField input;
+    JLabel status, countA, countB;
+    JSpinner capA, capB;
+    StackView viewA, viewB;
+    boolean adjusting = false;
+
+    static JPanel card(String title, JLabel countLabel) {
+        JPanel p = new JPanel(new BorderLayout(0, 8));
+        p.setBackground(CARD);
+        p.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(BORDER, 1, true), new EmptyBorder(12, 12, 12, 12)));
+        JPanel head = new JPanel(new BorderLayout());
+        head.setOpaque(false);
+        JLabel t = new JLabel(title);
+        t.setFont(new Font("SansSerif", Font.BOLD, 16));
+        t.setForeground(TEXT);
+        head.add(t, BorderLayout.WEST);
+        if (countLabel != null) {
+            countLabel.setFont(BASE);
+            countLabel.setForeground(MUTED);
+            head.add(countLabel, BorderLayout.EAST);
+        }
+        p.add(head, BorderLayout.NORTH);
+        return p;
+    }
+
+    JPanel capacityRow(JSpinner sp) {
+        JPanel r = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        r.setOpaque(false);
+        JLabel l = new JLabel("Max capacity:");
+        l.setFont(BASE);
+        l.setForeground(MUTED);
+        r.add(l);
+        r.add(sp);
+        return r;
+    }
+
+    static void styleSpinner(JSpinner sp) {
+        JTextField tf = ((JSpinner.DefaultEditor) sp.getEditor()).getTextField();
+        tf.setBackground(BG);
+        tf.setForeground(TEXT);
+        tf.setCaretColor(TEXT);
+        sp.setBorder(new LineBorder(BORDER, 1, true));
+    }
+
+    void say(String msg, Color c) { status.setText("  " + msg); status.setForeground(c); }
+
+    void log(String s) { history.add(0, s); }
+
+    void snapshot() { backupA = A.copy(); backupB = B.copy(); }
+
+    void refresh() {
+        countA.setText(A.size() + " / " + A.cap);
+        countB.setText(B.size() + " / " + B.cap);
+        adjusting = true;
+        capA.setValue(A.cap);
+        capB.setValue(B.cap);
+        adjusting = false;
+        viewA.repaint();
+        viewB.repaint();
+    }
+
+    void push() {
+        String v = input.getText().trim();
+        if (v.isEmpty()) { say("Type a value first.", AMBER); return; }
+        if (A.size() >= A.cap) { say("Stack A is full (overflow).", RED); return; }
+        snapshot(); A.push(v); log("PUSH A  →  " + v);
+        input.setText(""); input.requestFocus();
+        say("Pushed \"" + v + "\" onto Stack A.", GREEN); refresh();
+    }
+
+    void pop(ArrayStack s, String name) {
+        if (s.size() == 0) { say("Stack " + name + " is empty (underflow).", RED); return; }
+        snapshot(); String v = s.pop(); log("POP " + name + "  ←  " + v);
+        say("Popped \"" + v + "\" from Stack " + name + ".", GREEN); refresh();
+    }
+
+    void peek() {
+        if (A.size() == 0) { say("Stack A is empty.", AMBER); return; }
+        say("Top of Stack A is \"" + A.peek() + "\".", PRIMARY);
+        log("PEEK A  =  " + A.peek());
+    }
+
+    void clearA() {
+        if (A.size() == 0) { say("Stack A is already empty.", AMBER); return; }
+        snapshot(); A.clear(); log("CLEAR A"); say("Stack A cleared.", GREEN); refresh();
+    }
+
+    void check() {
+        say("A: " + A.size() + "/" + A.cap + (A.size() == 0 ? " (empty)" : A.size() >= A.cap ? " (full)" : "")
+                + "     B: " + B.size() + "/" + B.cap + (B.size() == 0 ? " (empty)" : B.size() >= B.cap ? " (full)" : ""),
+                PRIMARY);
+    }
+
+    void random() {
+        if (A.size() >= A.cap) { say("Stack A is full (overflow).", RED); return; }
+        snapshot(); String v = String.valueOf(rnd.nextInt(99) + 1);
+        A.push(v); log("RANDOM A  →  " + v); say("Pushed random value " + v + ".", GREEN); refresh();
+    }
+
+    void transfer() {
+        if (A.size() == 0) { say("Stack A is empty, nothing to transfer.", AMBER); return; }
+        if (B.size() >= B.cap) { say("Stack B is full.", RED); return; }
+        snapshot(); String v = A.pop(); B.push(v);
+        log("TRANSFER  A → B  :  " + v); say("Moved \"" + v + "\" from A to B.", GREEN); refresh();
+    }
+
+    void undo() {
+        if (backupA == null) { say("Nothing to undo.", AMBER); return; }
+        ArrayStack a = A.copy(), b = B.copy();
+        copyInto(A, backupA); copyInto(B, backupB);
+        backupA = null; backupB = null;
+        log("UNDO"); say("Last operation undone.", GREEN); refresh();
+    }
+
+    static void copyInto(ArrayStack to, ArrayStack from) {
+        to.data = from.data.clone(); to.top = from.top; to.cap = from.cap;
+    }
+
+    void capacityChanged(ArrayStack s, JSpinner sp, String name) {
+        if (adjusting) return;
+        int v = (Integer) sp.getValue();
+        if (v < s.size()) { say("Stack " + name + " already holds " + s.size() + " items.", AMBER); }
+        else { snapshot(); s.cap = v; log("CAPACITY " + name + " = " + v); say("Stack " + name + " capacity set to " + v + ".", GREEN); }
+        refresh();
+    }
+
+    void build() {
+        JFrame frame = new JFrame("Stack Visualization");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel root = new JPanel(new BorderLayout(12, 12));
+        root.setBackground(BG);
+        root.setBorder(new EmptyBorder(14, 14, 10, 14));
+
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(TEAL);
+        header.setBorder(new EmptyBorder(14, 18, 14, 18));
+        JLabel title = new JLabel("Stack Visualization");
+        title.setFont(new Font("SansSerif", Font.BOLD, 22));
+        title.setForeground(Color.WHITE);
+        JLabel sub1 = new JLabel("Group 9: Java Swing stack visualization with push, pop, peek, transfer,");
+        JLabel sub2 = new JLabel("and undo across two array-based stacks, plus a history log and adjustable capacity.");
+        for (JLabel l : new JLabel[]{sub1, sub2}) {
+            l.setFont(BASE);
+            l.setForeground(new Color(0xCDE9EA));
+        }
+        JPanel hp = new JPanel(new GridLayout(3, 1));
+        hp.setOpaque(false);
+        hp.add(title); hp.add(sub1); hp.add(sub2);
+        header.add(hp, BorderLayout.WEST);
+
+        RButton exitB = new RButton("EXIT", new Color(0x031716));
+        exitB.setPreferredSize(new Dimension(90, 38));
+        exitB.addActionListener(e -> {
+            int r = JOptionPane.showConfirmDialog(frame, "Exit the application?", "Exit",
+                    JOptionPane.YES_NO_OPTION);
+            if (r == JOptionPane.YES_OPTION) System.exit(0);
+        });
+        JPanel exitWrap = new JPanel(new GridBagLayout());
+        exitWrap.setOpaque(false);
+        exitWrap.add(exitB);
+        header.add(exitWrap, BorderLayout.EAST);
+        root.add(header, BorderLayout.NORTH);
+
+        countA = new JLabel(); countB = new JLabel();
+        viewA = new StackView(A); viewB = new StackView(B);
+        capA = new JSpinner(new SpinnerNumberModel(10, 1, 10, 1));
+        capB = new JSpinner(new SpinnerNumberModel(10, 1, 10, 1));
+        styleSpinner(capA); styleSpinner(capB);
+        capA.addChangeListener(e -> capacityChanged(A, capA, "A"));
+        capB.addChangeListener(e -> capacityChanged(B, capB, "B"));
+
+        JPanel cardA = card("Stack A", countA);
+        JPanel midA = new JPanel(new BorderLayout(0, 6));
+        midA.setOpaque(false);
+        midA.add(capacityRow(capA), BorderLayout.NORTH);
+        midA.add(viewA, BorderLayout.CENTER);
+        cardA.add(midA, BorderLayout.CENTER);
+
+        input = new JTextField();
+        input.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        input.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(BORDER, 1, true), new EmptyBorder(6, 8, 6, 8)));
+        input.setBackground(BG);
+        input.setForeground(TEXT);
+        input.setCaretColor(TEXT);
+        input.addActionListener(e -> push());
+        JLabel il = new JLabel("Value");
+        il.setFont(BOLD); il.setForeground(TEXT);
+
+        RButton pushB = new RButton("PUSH", new Color(0x031716));
+        RButton popB = new RButton("POP", new Color(0x032F30));
+        RButton peekB = new RButton("PEEK", new Color(0x0A7075));
+        RButton clearB = new RButton("CLEAR", new Color(0x0C969C));
+        RButton checkB = new RButton("CHECK STACK", new Color(0x6BA3BE));
+        RButton randB = new RButton("RANDOM", new Color(0x274D60));
+        pushB.addActionListener(e -> push());
+        popB.addActionListener(e -> pop(A, "A"));
+        peekB.addActionListener(e -> peek());
+        clearB.addActionListener(e -> clearA());
+        checkB.addActionListener(e -> check());
+        randB.addActionListener(e -> random());
+
+        JPanel btns = new JPanel(new GridLayout(2, 3, 8, 8));
+        btns.setOpaque(false);
+        for (JButton b : new JButton[]{pushB, popB, peekB, clearB, checkB, randB}) btns.add(b);
+
+        JPanel south = new JPanel(new BorderLayout(0, 8));
+        south.setOpaque(false);
+        JPanel inRow = new JPanel(new BorderLayout(8, 0));
+        inRow.setOpaque(false);
+        inRow.add(il, BorderLayout.WEST);
+        inRow.add(input, BorderLayout.CENTER);
+        south.add(inRow, BorderLayout.NORTH);
+        south.add(btns, BorderLayout.CENTER);
+        cardA.add(south, BorderLayout.SOUTH);
+
+        JPanel cardB = card("Stack B", countB);
+        JPanel midB = new JPanel(new BorderLayout(0, 6));
+        midB.setOpaque(false);
+        midB.add(capacityRow(capB), BorderLayout.NORTH);
+        midB.add(viewB, BorderLayout.CENTER);
+        cardB.add(midB, BorderLayout.CENTER);
+
+        RButton transferB = new RButton("TRANSFER A → B", new Color(0x0A7075));
+        RButton popBB = new RButton("POP B", new Color(0x0C969C));
+        RButton undoB = new RButton("UNDO", new Color(0x6BA3BE));
+        transferB.addActionListener(e -> transfer());
+        popBB.addActionListener(e -> pop(B, "B"));
+        undoB.addActionListener(e -> undo());
+        JLabel hint = new JLabel("Stack B receives values from TRANSFER", JLabel.CENTER);
+        hint.setFont(BASE); hint.setForeground(MUTED);
+        JPanel bBtns = new JPanel(new GridLayout(3, 1, 8, 8));
+        bBtns.setOpaque(false);
+        bBtns.add(transferB); bBtns.add(popBB); bBtns.add(undoB);
+        JPanel bSouth = new JPanel(new BorderLayout(0, 8));
+        bSouth.setOpaque(false);
+        bSouth.add(hint, BorderLayout.NORTH);
+        bSouth.add(bBtns, BorderLayout.CENTER);
+        cardB.add(bSouth, BorderLayout.SOUTH);
+
+        JPanel cardH = card("History", null);
+        JList<String> hl = new JList<>(history);
+        hl.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        hl.setBackground(BG);
+        hl.setForeground(TEXT);
+        hl.setFixedCellHeight(22);
+        hl.setSelectionBackground(STEEL);
+        hl.setSelectionForeground(Color.WHITE);
+        JScrollPane sp = new JScrollPane(hl);
+        sp.setBorder(new LineBorder(BORDER, 1, true));
+        sp.getViewport().setBackground(BG);
+        cardH.add(sp, BorderLayout.CENTER);
+
+        JPanel center = new JPanel(new GridLayout(1, 3, 12, 0));
+        center.setOpaque(false);
+        center.add(cardA); center.add(cardB); center.add(cardH);
+        root.add(center, BorderLayout.CENTER);
+
+        status = new JLabel("  Ready");
+        status.setFont(BOLD);
+        status.setForeground(MUTED);
+        status.setOpaque(true);
+        status.setBackground(CARD);
+        status.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(BORDER, 1, true), new EmptyBorder(8, 8, 8, 8)));
+        root.add(status, BorderLayout.SOUTH);
+
+        frame.setContentPane(root);
+        frame.setSize(1100, 620);
+        frame.setMinimumSize(new Dimension(900, 560));
+        frame.setLocationRelativeTo(null);
+        refresh();
+        frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try { UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); }
+            catch (Exception ignored) { }
+            new Main().build();
+        });
+    }
+}
