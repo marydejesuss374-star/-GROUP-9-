@@ -38,7 +38,6 @@ public class Main {
         buttonPanel.add(checkButton);
         buttonPanel.add(randomButton);
 
-        // Vertical stack visualization
         DefaultListModel<String> stackModel = new DefaultListModel<>();
         JList<String> stackList = new JList<>(stackModel);
         stackList.setVisibleRowCount(5);
@@ -125,7 +124,6 @@ public class Main {
         frame.setVisible(true);
     }
 
-    // Updates the vertical visualization
     private static void updateStack(
             String[] stack, int top, DefaultListModel<String> model) {
 
