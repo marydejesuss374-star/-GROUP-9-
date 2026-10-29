@@ -1,4 +1,4 @@
-# Stack
+# Group Project - Stack
 # Group 9
 # Group Members
 - Glaiza Mae Uyangurin Orence 
