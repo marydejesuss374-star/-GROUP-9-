@@ -16,9 +16,9 @@
 # Description of the program
 # Features
 # Requirements
-# How to run the program
 
-# How to Run the Program in Visual Studio Code
+
+# How to run the program
 
 1. Install Java JDK. Download and install a JDK if you do not have one yet.
 2. Install Visual Studio Code. Open VS Code and install the Extension Pack for Java from the Extensions Marketplace.
