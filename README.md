@@ -45,6 +45,18 @@
 
 
 # Project Structure
+
+1. Main.java – Contains the graphical user interface, including the input field, buttons, status message, and vertical stack display.
+
+2. Array Stack – Uses an array to store the values entered by the user and manages the top position of the stack.
+
+3. Button Actions – Handles the Push, Pop, and Peek operations when the user clicks the buttons. It also includes Clear, Check Stack, and Random actions.
+
+4. Stack Visualization – Updates the GUI to display the current stack contents whenever an item is added or removed.
+
+5. Main Method – Runs the program and opens the Stack Visualization window.
+
+
 # Stack Implementation
 # Screenshots
 
