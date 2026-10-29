@@ -1,7 +1,6 @@
 # Stack
-## Group 9
-
-## Group Members
+# Group 9
+# Group Members
 - Glaiza Mae Uyangurin Orence 
 
 - Rosel Andraje
