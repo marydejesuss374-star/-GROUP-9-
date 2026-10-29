@@ -17,6 +17,18 @@
 # Features
 # Requirements
 # How to run the program
+
+# How to Run the Program in Visual Studio Code
+
+1. Install Java JDK. Download and install a JDK if you do not have one yet.
+2. Install Visual Studio Code. Open VS Code and install the Extension Pack for Java from the Extensions Marketplace.
+3. Create a Java file. Create a folder for your project, open it in VS Code, and create a file.
+4. Copy the code. Paste your Stack Visualization Java code and save it.
+5. Run the program. Click the Run button above the `main` method, or right-click the code and select Run Java.
+6. View the GUI. A separate window titled Stack Visualization should appear.
+7. Test the buttons. Enter a value and click PUSH, POP, or PEEK to test the stack operations.
+
+
 # Project Structure
 # Stack Implementation
 # Screenshots
