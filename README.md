@@ -77,18 +77,26 @@ Our group implemented the stack using an array to store the values entered by th
 **1. Name the specific AI tool and its version number.**
 
 ChatGPT by OpenAI (GPT-6).
+Claude (Sonnet 5.5 Extra).
 
 **2. State the task the tool performed.**
 
 We used ChatGPT for minor assistance in checking our Java code and understanding how to connect the Push, Pop, and Peek buttons to our array stack and GUI.
 
+We used Claude for minor assistance to understand how to add undo button, second stack and implement a way to transfer elements from stack A to stack
+B, operation history, and a maximum capacity selector.
+
 **3. State the prompts used for this activity.**
 
 We asked ChatGPT for small suggestions on how to connect our existing GUI buttons to the array stack and make the button actions work properly.
 
+We asked claude what function/command in our buttons in array stack.
+
 **4. Confirm the extent of use, from a single check to substantial drafting.**
 
 We mainly developed the code ourselves and only used ChatGPT for minor guidance when we encountered problems or needed clarification.
+
+
 
 **5. Include a statement that a human author verified the output.**
 
@@ -102,12 +110,18 @@ We used ChatGPT as a guide to help us understand some parts of the code and fix 
 
 Approximately 10% of our work was assisted by AI, mainly through suggestions and explanations.
 
+15% of our work assisted by AI.
+
 **8. What are the changes you made to the AI-generated output?**
 
 We made our own adjustments to the code to fit our existing GUI design, button names, and array stack implementation.
 
+I rejected Claude’s first two versions and asked for a simpler one that keeps my original code.
+
 **9. What have you learned from using the tool?**
 
 We learned how to connect GUI buttons to array stack operations. We also gained a better understanding of how Push, Pop, and Peek work and how to display stack items vertically in a GUI.
+
+I learned how undo can work by saving a copy of the stacks before each operation, and that AI code must be run and tested before I submit it.
 
 # Contributors
