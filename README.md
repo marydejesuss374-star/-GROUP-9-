@@ -17,16 +17,19 @@ This program demonstrates the implementation of a Stack data structure using Jav
 
 # Features
 
-1. Push – Adds a new value to the top of the stack.
-2. Pop – Removes the top value from the stack.
-3. Peek – Shows the top value without removing it.
-4. Vertical Stack Visualization – Displays the stack items vertically in the GUI.
-5. Input Field – Allows users to enter values to add to the stack.
-6. Clear Stack – Removes all items from the stack.
-7. Check Stack – Shows the current number of items in the stack.
-8. Random Value – Generates a random number and adds it to the stack.
-9. Empty Stack Check – Prevents Pop and Peek from working when the stack is empty.
-10. Full Stack Check – Prevents adding more items when the array reaches its maximum capacity.
+1.	Push – Adds a new value to the top of the stack A.
+2.	Pop – Removes the top value from the stack A.
+3.	Peek – Shows the top value without removing it.
+4.	Vertical Stack Visualization – Displays the stack items vertically in the GUI.
+5.	Input Field – Allows users to enter values to add to the stack.
+6.	Clear Stack – Removes all items from the stack A.
+7.	Check Stack – Shows the current number of items in the stack.
+8.	Random Value – Generates a random number and adds it to the stack A.
+9.	Empty Stack Check – Prevents Pop and Peek from working when the stack is empty.
+10.	Full Stack Check – Prevents adding more items when the array reaches its maximum capacity.
+11.	Transfer A to B – Transfers or pushes the value of the TOP of Stack A to the TOP of Stack B 
+12.	Pop B - Removes the top value from Stack B.
+13.	Undo –  Which undo the previously performed operation
 
 
 # Requirements
